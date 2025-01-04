@@ -11,7 +11,7 @@ use ratatui::{
 
 use super::Component;
 
-use crate::action::Action;
+use crate::{action::Action, app::Mode};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct FpsCounter {
@@ -75,6 +75,10 @@ impl Component for FpsCounter {
             _ => {}
         };
         Ok(None)
+    }
+
+    fn mode(&self) -> Option<Mode> {
+        None
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {

@@ -2,12 +2,13 @@ use color_eyre::Result;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::Rect;
 use serde::{Deserialize, Serialize};
+use strum::Display;
 use tokio::sync::mpsc;
 use tracing::{debug, info};
 
 use crate::{
     action::Action,
-    components::{fps::FpsCounter, home::Home, Component},
+    components::{fps::FpsCounter, home::Home, notes::Note, Component},
     config::Config,
     tui::{Event, Tui},
 };
@@ -25,10 +26,22 @@ pub struct App {
     action_rx: mpsc::UnboundedReceiver<Action>,
 }
 
-#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Display, Deserialize)]
 pub enum Mode {
     #[default]
     Home,
+    Note,
+}
+
+impl Mode {
+    pub fn switch(&mut self) -> Result<()> {
+        *self = match self {
+            Mode::Home => Mode::Note,
+            Mode::Note => Mode::Home,
+        };
+        info!("The switch function has been triggered to {}.", &self);
+        Ok(())
+    }
 }
 
 impl App {
@@ -37,7 +50,11 @@ impl App {
         Ok(Self {
             tick_rate,
             frame_rate,
-            components: vec![Box::new(Home::new()), Box::new(FpsCounter::default())],
+            components: vec![
+                Box::new(Home::new()),
+                Box::new(Note::new()),
+                Box::new(FpsCounter::default()),
+            ],
             should_quit: false,
             should_suspend: false,
             config: Config::new()?,
@@ -91,6 +108,7 @@ impl App {
         let action_tx = self.action_tx.clone();
         match event {
             Event::Quit => action_tx.send(Action::Quit)?,
+            Event::Switch => action_tx.send(Action::Switch)?,
             Event::Tick => action_tx.send(Action::Tick)?,
             Event::Render => action_tx.send(Action::Render)?,
             Event::Resize(x, y) => action_tx.send(Action::Resize(x, y))?,
@@ -140,6 +158,8 @@ impl App {
                     self.last_tick_key_events.drain(..);
                 }
                 Action::Quit => self.should_quit = true,
+                Action::Switch => self.mode.switch()?,
+
                 Action::Suspend => self.should_suspend = true,
                 Action::Resume => self.should_suspend = false,
                 Action::ClearScreen => tui.terminal.clear()?,
@@ -165,10 +185,12 @@ impl App {
     fn render(&mut self, tui: &mut Tui) -> Result<()> {
         tui.draw(|frame| {
             for component in self.components.iter_mut() {
-                if let Err(err) = component.draw(frame, frame.area()) {
-                    let _ = self
-                        .action_tx
-                        .send(Action::Error(format!("Failed to draw: {:?}", err)));
+                if component.mode().is_none() || component.mode() == Some(self.mode) {
+                    if let Err(err) = component.draw(frame, frame.area()) {
+                        let _ = self
+                            .action_tx
+                            .send(Action::Error(format!("Failed to draw: {:?}", err)));
+                    }
                 }
             }
         })?;

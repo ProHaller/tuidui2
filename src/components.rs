@@ -6,16 +6,24 @@ use ratatui::{
 };
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{action::Action, config::Config, tui::Event};
+use crate::{action::Action, app::Mode, config::Config, tui::Event};
 
 pub mod fps;
 pub mod home;
+pub mod notes;
 
 /// `Component` is a trait that represents a visual and interactive element of the user interface.
 ///
 /// Implementors of this trait can be registered with the main application loop and will be able to
 /// receive events, update state, and be rendered on the screen.
 pub trait Component {
+    /// This should allow for a selective display of the component based on the current mode.
+    // NOTE: Why should it by None instead of itself?
+    fn mode(&self) -> Option<Mode> {
+        None
+    }
+
+    ///
     /// Register an action handler that can send actions for processing if necessary.
     ///
     /// # Arguments

@@ -8,14 +8,14 @@ use derive_deref::{Deref, DerefMut};
 use directories::ProjectDirs;
 use lazy_static::lazy_static;
 use ratatui::style::{Color, Modifier, Style};
-use serde::{de::Deserializer, Deserialize};
+use serde::{de::Deserializer, Deserialize, Serialize};
 use tracing::error;
 
 use crate::{action::Action, app::Mode};
 
 const CONFIG: &str = include_str!("../.config/config.json5");
 
-#[derive(Clone, Debug, Deserialize, Default)]
+#[derive(Clone, Debug, Deserialize, Serialize, Default)]
 pub struct AppConfig {
     #[serde(default)]
     pub data_dir: PathBuf,
@@ -23,7 +23,7 @@ pub struct AppConfig {
     pub config_dir: PathBuf,
 }
 
-#[derive(Clone, Debug, Default, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Config {
     #[serde(default, flatten)]
     pub config: AppConfig,
@@ -60,6 +60,7 @@ impl Config {
             ("config.yaml", config::FileFormat::Yaml),
             ("config.toml", config::FileFormat::Toml),
             ("config.ini", config::FileFormat::Ini),
+            ("config.ron", config::FileFormat::Ron),
         ];
         let mut found_config = false;
         for (file, format) in &config_files {
@@ -122,7 +123,7 @@ fn project_directory() -> Option<ProjectDirs> {
     ProjectDirs::from("com", "kdheepak", env!("CARGO_PKG_NAME"))
 }
 
-#[derive(Clone, Debug, Default, Deref, DerefMut)]
+#[derive(Clone, Debug, Default, Deref, DerefMut, Serialize)]
 pub struct KeyBindings(pub HashMap<Mode, HashMap<Vec<KeyEvent>, Action>>);
 
 impl<'de> Deserialize<'de> for KeyBindings {
@@ -318,7 +319,7 @@ pub fn parse_key_sequence(raw: &str) -> Result<Vec<KeyEvent>, String> {
     sequences.into_iter().map(parse_key_event).collect()
 }
 
-#[derive(Clone, Debug, Default, Deref, DerefMut)]
+#[derive(Clone, Debug, Default, Deref, DerefMut, Serialize)]
 pub struct Styles(pub HashMap<Mode, HashMap<String, Style>>);
 
 impl<'de> Deserialize<'de> for Styles {

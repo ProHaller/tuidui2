@@ -6,18 +6,18 @@ use super::Component;
 use crate::{action::Action, app::Mode, config::Config};
 
 #[derive(Default)]
-pub struct Home {
+pub struct Note {
     command_tx: Option<UnboundedSender<Action>>,
     config: Config,
 }
 
-impl Home {
+impl Note {
     pub fn new() -> Self {
         Self::default()
     }
 }
 
-impl Component for Home {
+impl Component for Note {
     fn register_action_handler(&mut self, tx: UnboundedSender<Action>) -> Result<()> {
         self.command_tx = Some(tx);
         Ok(())
@@ -30,7 +30,7 @@ impl Component for Home {
 
     // This should set the mode to its own.
     fn mode(&self) -> Option<Mode> {
-        Some(Mode::Home)
+        Some(Mode::Note)
     }
 
     fn update(&mut self, action: Action) -> Result<Option<Action>> {
@@ -47,7 +47,7 @@ impl Component for Home {
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
-        frame.render_widget(Paragraph::new("hello world"), area);
+        frame.render_widget(Paragraph::new("This is a note").centered(), area);
         Ok(())
     }
 }

@@ -1,3 +1,4 @@
+use crate::components::notes::Note;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
@@ -12,4 +13,11 @@ pub enum Action {
     ClearScreen,
     Error(String),
     Help,
+    Switch,
+    CreateNote,
+    DeleteNote(String),
+    EditNote(String),
+    ListNote,
+    SaveNote,
+    SearchNotes(String),
 }

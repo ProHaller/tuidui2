@@ -30,6 +30,7 @@ use tracing::error;
 pub enum Event {
     Init,
     Quit,
+    Switch,
     Error,
     Closed,
     Tick,
