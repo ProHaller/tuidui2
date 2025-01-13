@@ -1,4 +1,3 @@
-use crate::components::notes::Note;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 

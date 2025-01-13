@@ -10,6 +10,7 @@ use lazy_static::lazy_static;
 use ratatui::style::{Color, Modifier, Style};
 use serde::{de::Deserializer, Deserialize, Serialize};
 use tracing::error;
+use tracing::info;
 
 use crate::{action::Action, app::Mode};
 
@@ -93,6 +94,7 @@ impl Config {
             }
         }
 
+        info!("cfg: {:#?}", cfg);
         Ok(cfg)
     }
 }
@@ -439,6 +441,8 @@ fn parse_color(s: &str) -> Option<Color> {
         Some(Color::Indexed(4))
     } else if s == "magenta" {
         Some(Color::Indexed(5))
+    } else if s == "light cyan" {
+        Some(Color::LightCyan)
     } else if s == "cyan" {
         Some(Color::Indexed(6))
     } else if s == "white" {
