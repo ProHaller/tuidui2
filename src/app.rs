@@ -8,7 +8,7 @@ use tracing::{debug, info};
 
 use crate::{
     action::Action,
-    components::{fps::FpsCounter, home::Home, notes::Note, Component},
+    components::{fps::FpsCounter, home::Home, keys::Keys, notes::Note, Component},
     config::Config,
     tui::{Event, Tui},
 };
@@ -54,6 +54,7 @@ impl App {
                 Box::new(Home::new()),
                 Box::new(Note::new()),
                 Box::new(FpsCounter::default()),
+                Box::new(Keys::default()),
             ],
             should_quit: false,
             should_suspend: false,

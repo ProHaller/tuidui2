@@ -29,7 +29,7 @@ impl Component for Note {
     }
 
     // This should set the mode to its own.
-    fn mode(&self) -> Option<Mode> {
+    fn mode(&mut self) -> Option<Mode> {
         Some(Mode::Note)
     }
 

@@ -10,6 +10,7 @@ use crate::{action::Action, app::Mode, config::Config, tui::Event};
 
 pub mod fps;
 pub mod home;
+pub mod keys;
 pub mod notes;
 
 /// `Component` is a trait that represents a visual and interactive element of the user interface.
@@ -18,8 +19,7 @@ pub mod notes;
 /// receive events, update state, and be rendered on the screen.
 pub trait Component {
     /// This should allow for a selective display of the component based on the current mode.
-    // NOTE: Why should it by None instead of itself?
-    fn mode(&self) -> Option<Mode> {
+    fn mode(&mut self) -> Option<Mode> {
         None
     }
 
@@ -37,11 +37,11 @@ pub trait Component {
         let _ = tx; // to appease clippy
         Ok(())
     }
-    /// Register a configuration handler that provides configuration settings if necessary.
+    /// Register a mode handler that provides mode state if necessary.
     ///
     /// # Arguments
     ///
-    /// * `config` - Configuration settings.
+    /// * `mode` - Mode state.
     ///
     /// # Returns
     ///

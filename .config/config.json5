@@ -8,11 +8,11 @@
       "<Ctrl-z>": "Suspend" // Suspend the application
     },
     "Note": {
-      "<s>": "Switch", // Switch to the next mode
-      "<q>": "Quit", // Quit the application
-      "<Ctrl-d>": "Quit", // Another way to quit
-      "<Ctrl-c>": "Quit", // Yet another way to quit
-      "<Ctrl-z>": "Suspend" // Suspend the application
+      "<r>": "Switch", // Switch to the next mode
+      "<e>": "Quit", // Quit the application
+      "<Ctrl-w>": "Quit", // Another way to quit
+      "<Ctrl-t>": "Quit", // Yet another way to quit
+      "<Ctrl-g>": "Suspend" // Suspend the application
     },
   },
   "styles": {

@@ -6,7 +6,6 @@ use std::{
 use color_eyre::Result;
 use crossterm::event::KeyModifiers;
 use itertools::Itertools;
-use libc::group;
 use ratatui::{prelude::*, widgets::*};
 use tokio::sync::mpsc::UnboundedSender;
 use tui_markdown::*;
@@ -23,6 +22,7 @@ use crate::{
 pub struct Home {
     command_tx: Option<UnboundedSender<Action>>,
     config: Config,
+    mode: Mode,
 }
 
 impl Home {
@@ -43,7 +43,7 @@ impl Component for Home {
     }
 
     // This should set the mode to its own.
-    fn mode(&self) -> Option<Mode> {
+    fn mode(&mut self) -> Option<Mode> {
         Some(Mode::Home)
     }
 
@@ -91,28 +91,22 @@ Rust is the fearless guardian of memory safety, ensuring your tasks are managed 
             })
             .borders(Borders::ALL);
 
-        let bindings = &self.config.keybindings[&self.mode().unwrap()];
+        let bindings = &self.config.keybindings[&self.mode];
 
         let mut grouped_bindings = HashMap::new();
         for (key_events, action) in bindings {
             for key_event in key_events {
-                match key_event.modifiers {
-                    KeyModifiers::NONE => {
-                        let conf = format!("<{}>", key_event.code);
-                        grouped_bindings
-                            .entry(action.to_string())
-                            .or_insert(Vec::new())
-                            .push(conf);
-                    }
-                    KeyModifiers::CONTROL => {
-                        let conf = format!("<C-{}>", key_event.code);
-                        grouped_bindings
-                            .entry(action.to_string())
-                            .or_insert(Vec::new())
-                            .push(conf);
-                    }
-                    _ => {}
-                }
+                let modif = match key_event.modifiers {
+                    KeyModifiers::NONE => "".to_string(),
+                    KeyModifiers::CONTROL => "C-".to_string(),
+                    KeyModifiers::SHIFT => "S-".to_string(),
+                    _ => format!("{}-", key_event.modifiers),
+                };
+                let conf = format!("<{}{}>", modif, key_event.code);
+                grouped_bindings
+                    .entry(action.to_string())
+                    .or_insert(Vec::new())
+                    .push(conf);
             }
         }
 
